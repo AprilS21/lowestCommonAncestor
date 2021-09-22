@@ -1,438 +1,265 @@
-//author Robert Sedgewick
-//author Kevin Wayne
+/*************************************************************************
+ *  Binary Search Tree class.
+ *  Adapted from Sedgewick and Wayne.
+ *
+ *  @version 3.0 1/11/15 16:49:42
+ *
+ *  @author TODO
+ *
+ *************************************************************************/
 
 
 import java.util.NoSuchElementException;
 
 public class BST<Key extends Comparable<Key>, Value> {
-    public Node root;             // root of BST
+	private Node root;             // root of BST
 
-    private class Node {
-        private Key key;           // sorted by key
-        private Value val;         // associated data
-        private Node left, right;  // left and right subtrees
-        private int size;          // number of nodes in subtree
+	/**
+	 * Private node class.
+	 */
+	private class Node {
+		private Key key;           // sorted by key
+		private Value val;         // associated data
+		private Node left, right;  // left and right subtrees
+		private int N;             // number of nodes in subtree
 
-        public Node(Key key, Value val, int size) {
-            this.key = key;
-            this.val = val;
-            this.size = size;
-        }
-    }
+		public Node(Key key, Value val, int N) {
+			this.key = key;
+			this.val = val;
+			this.N = N;
+		}
+	}
 
-    /**
-     * Initializes an empty symbol table.
-     */
-    public BST() {
-    }
+	// is the symbol table empty?
+	public boolean isEmpty() { return size() == 0; }
 
-    /**
-     * Returns true if this symbol table is empty.
-     * @return {@code true} if this symbol table is empty; {@code false} otherwise
-     */
-    public boolean isEmpty() {
-        return size() == 0;
-    }
+	// return number of key-value pairs in BST
+	public int size() { return size(root); }
 
-    /**
-     * Returns the number of key-value pairs in this symbol table.
-     * @return the number of key-value pairs in this symbol table
-     */
-    public int size() {
-        return size(root);
-    }
+	// return number of key-value pairs in BST rooted at x
+	private int size(Node x) {
+		if (x == null) return 0;
+		else return x.N;
+	}
 
-    // return number of key-value pairs in BST rooted at x
-    private int size(Node x) {
-        if (x == null) return 0;
-        else return x.size;
-    }
+	/**
+	 *  Search BST for given key.
+	 *  Does there exist a key-value pair with given key?
+	 *
+	 *  @param key the search key
+	 *  @return true if key is found and false otherwise
+	 */
+	public boolean contains(Key key) {
+		return get(key) != null;
+	}
 
-    /**
-     * Does this symbol table contain the given key?
-     *
-     * @param  key the key
-     * @return {@code true} if this symbol table contains {@code key} and
-     *         {@code false} otherwise
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public boolean contains(Key key) {
-        if (key == null) throw new IllegalArgumentException("argument to contains() is null");
-        return get(key) != null;
-    }
+	/**
+	 *  Search BST for given key.
+	 *  What is the value associated with given key?
+	 *
+	 *  @param key the search key
+	 *  @return value associated with the given key if found, or null if no such key exists.
+	 */
+	public Value get(Key key) { return get(root, key); }
 
-    /**
-     * Returns the value associated with the given key.
-     *
-     * @param  key the key
-     * @return the value associated with the given key if the key is in the symbol table
-     *         and {@code null} if the key is not in the symbol table
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public Value get(Key key) {
-        return get(root, key);
-    }
+	private Value get(Node x, Key key) {
+		if (x == null) return null;
+		int cmp = key.compareTo(x.key);
+		if      (cmp < 0) return get(x.left, key);
+		else if (cmp > 0) return get(x.right, key);
+		else              return x.val;
+	}
 
-    private Value get(Node x, Key key) {
-        if (key == null) throw new IllegalArgumentException("calls get() with a null key");
-        if (x == null) return null;
-        int cmp = key.compareTo(x.key);
-        if      (cmp < 0) return get(x.left, key);
-        else if (cmp > 0) return get(x.right, key);
-        else              return x.val;
-    }
+	/**
+	 *  Insert key-value pair into BST.
+	 *  If key already exists, update with new value.
+	 *
+	 *  @param key the key to insert
+	 *  @param val the value associated with key
+	 */
+	public void put(Key key, Value val) {
+		if (val == null) { delete(key); return; }
+		root = put(root, key, val);
+	}
 
-    /**
-     * Inserts the specified key-value pair into the symbol table, overwriting the old 
-     * value with the new value if the symbol table already contains the specified key.
-     * Deletes the specified key (and its associated value) from this symbol table
-     * if the specified value is {@code null}.
-     *
-     * @param  key the key
-     * @param  val the value
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public void put(Key key, Value val) {
-        if (key == null) throw new IllegalArgumentException("calls put() with a null key");
-        if (val == null) {
-            delete(key);
-            return;
-        }
-        root = put(root, key, val);
-        
-    }
+	private Node put(Node x, Key key, Value val) {
+		if (x == null) return new Node(key, val, 1);
+		int cmp = key.compareTo(x.key);
+		if      (cmp < 0) x.left  = put(x.left,  key, val);
+		else if (cmp > 0) x.right = put(x.right, key, val);
+		else              x.val   = val;
+		x.N = 1 + size(x.left) + size(x.right);
+		return x;
+	}
 
-    private Node put(Node x, Key key, Value val) {
-        if (x == null) return new Node(key, val, 1);
-        int cmp = key.compareTo(x.key);
-        if      (cmp < 0) x.left  = put(x.left,  key, val);
-        else if (cmp > 0) x.right = put(x.right, key, val);
-        else              x.val   = val;
-        x.size = 1 + size(x.left) + size(x.right);
-        return x;
-    }
+	/**
+	 * Tree height.
+	 *
+	 * Asymptotic worst-case running time using Theta notation: O(n), it must run through the whole tree and each node.
+	 * 												It must check all paths until it gets to the deepest leaf.
+	 *
+	 * @return the number of links from the root to the deepest leaf.
+	 *
+	 * Example 1: for an empty tree this should return -1.
+	 * Example 2: for a tree with only one node it should return 0.
+	 * Example 3: for the following tree it should return 2.
+	 *   B
+	 *  / \
+	 * A   C
+	 *      \
+	 *       D
+	 */
+	public int height() {
+		//TODO fill in the correct implementation.
+		return height(root);
+	}
 
+	private int height(Node node) {
+		if(node == null) {
+			return -1;
+		}
+		return Math.max(height(node.left), height(node.right)) + 1;
+	}
 
-    /**
-     * Removes the smallest key and associated value from the symbol table.
-     *
-     * @throws NoSuchElementException if the symbol table is empty
-     */
-    public void deleteMin() {
-        if (isEmpty()) throw new NoSuchElementException("Symbol table underflow");
-        root = deleteMin(root);
-        
-    }
+	/**
+	 * Median key.
+	 * If the tree has N keys k1 < k2 < k3 < ... < kN, then their median key 
+	 * is the element at position (N-1)/2 (where "/" here is integer division)
+	 *
+	 * @return the median key, or null if the tree is empty.
+	 */
+	public Key median() {
+		//TODO fill in the correct implementation. The running time should be Theta(h), where h is the height of the tree.
+		int rank = Math.floorDiv(size()-1,2);
 
-    private Node deleteMin(Node x) {
-        if (x.left == null) return x.right;
-        x.left = deleteMin(x.left);
-        x.size = size(x.left) + size(x.right) + 1;
-        return x;
-    }
+		return median(root,rank);
+	}
+	private Key median(Node node, int rank) {
+		if (node == null) return null;
+		int leftSize = size(node.left);
+		if      (leftSize > rank) return median(node.left,  rank);
+		else if (leftSize < rank) return median(node.right, rank - leftSize - 1); 
+		else                      return node.key;
 
-    /**
-     * Removes the largest key and associated value from the symbol table.
-     *
-     * @throws NoSuchElementException if the symbol table is empty
-     */
-    public void deleteMax() {
-        if (isEmpty()) throw new NoSuchElementException("Symbol table underflow");
-        root = deleteMax(root);
-
-    }
-
-    private Node deleteMax(Node x) {
-        if (x.right == null) return x.left;
-        x.right = deleteMax(x.right);
-        x.size = size(x.left) + size(x.right) + 1;
-        return x;
-    }
-
-    /**
-     * Removes the specified key and its associated value from this symbol table     
-     * (if the key is in this symbol table).    
-     *
-     * @param  key the key
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public void delete(Key key) {
-        if (key == null) throw new IllegalArgumentException("calls delete() with a null key");
-        root = delete(root, key);
-
-    }
-
-    private Node delete(Node x, Key key) {
-        if (x == null) return null;
-
-        int cmp = key.compareTo(x.key);
-        if      (cmp < 0) x.left  = delete(x.left,  key);
-        else if (cmp > 0) x.right = delete(x.right, key);
-        else { 
-            if (x.right == null) return x.left;
-            if (x.left  == null) return x.right;
-            Node t = x;
-            x = min(t.right);
-            x.right = deleteMin(t.right);
-            x.left = t.left;
-        } 
-        x.size = size(x.left) + size(x.right) + 1;
-        return x;
-    } 
+	}
 
 
-    /**
-     * Returns the smallest key in the symbol table.
-     *
-     * @return the smallest key in the symbol table
-     * @throws NoSuchElementException if the symbol table is empty
-     */
-    public Key min() {
-        if (isEmpty()) throw new NoSuchElementException("calls min() with empty symbol table");
-        return min(root).key;
-    } 
+	/**
+	 * Print all keys of the tree in a sequence, in-order.
+	 * That is, for each node, the keys in the left subtree should appear before the key in the node.
+	 * Also, for each node, the keys in the right subtree should appear before the key in the node.
+	 * For each subtree, its keys should appear within a parenthesis.
+	 *
+	 * Example 1: Empty tree -- output: "()"
+	 * Example 2: Tree containing only "A" -- output: "(()A())"
+	 * Example 3: Tree:
+	 *   B
+	 *  / \
+	 * A   C
+	 *      \
+	 *       D
+	 *
+	 * output: "((()A())B(()C(()D())))"
+	 *
+	 * output of example in the assignment: (((()A(()C()))E((()H(()M()))R()))S(()X()))
+	 *
+	 * @return a String with all keys in the tree, in order, parenthesized.
+	 */
+	public String printKeysInOrder() {
+		if(isEmpty()) return "()";
+		return "(" + inorder(root,"") + ")";
+	}
+	private String inorder(Node node, String string) {
+		if( node== null) {
+			return "";
+		}
+		string = string +"(" + inorder(node.left,string) + ")" + node.key + "(" + inorder(node.right, string) + ")";
+		return string;
+	}
 
-    private Node min(Node x) { 
-        if (x.left == null) return x; 
-        else                return min(x.left); 
-    } 
+	/**
+	 * Pretty Printing the tree. Each node is on one line -- see assignment for details.
+	 *
+	 * @return a multi-line string with the pretty ascii picture of the tree.
+	 */
+	public String prettyPrintKeys() {
+		//TODO fill in the correct implementation.
+		String prefix = "";
+		String string = prettyPrint(root,prefix);
+		//System.out.print(string);
+		return string;
+	}
 
-    /**
-     * Returns the largest key in the symbol table.
-     *
-     * @return the largest key in the symbol table
-     * @throws NoSuchElementException if the symbol table is empty
-     */
-    public Key max() {
-        if (isEmpty()) throw new NoSuchElementException("calls max() with empty symbol table");
-        return max(root).key;
-    } 
+	private String prettyPrint(Node node, String prefix) {
+		String string = "";
 
-    private Node max(Node x) {
-        if (x.right == null) return x; 
-        else                 return max(x.right); 
-    } 
+		if(node != null) {
+			string+= prefix + "-"+node.key +"\n";
+			string += prettyPrint(node.left, prefix + " "+"|");
+			string += prettyPrint(node.right, prefix + "  ");
+		}else 
+			//if(node == null) 
+		{
+			string+= prefix + "-null\n";
+		}
+		return string;
+	}
 
-    /**
-     * Returns the largest key in the symbol table less than or equal to {@code key}.
-     *
-     * @param  key the key
-     * @return the largest key in the symbol table less than or equal to {@code key}
-     * @throws NoSuchElementException if there is no such key
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public Key floor(Key key) {
-        if (key == null) throw new IllegalArgumentException("argument to floor() is null");
-        if (isEmpty()) throw new NoSuchElementException("calls floor() with empty symbol table");
-        Node x = floor(root, key);
-        if (x == null) throw new NoSuchElementException("argument to floor() is too small");
-        else return x.key;
-    } 
+	/**
+	 * Deletes a key from a tree (if the key is in the tree).
+	 * Note that this method works symmetrically from the Hibbard deletion:
+	 * If the node to be deleted has two child nodes, then it needs to be
+	 * replaced with its predecessor (not its successor) node.
+	 *
+	 * @param key the key to delete
+	 */
+	public void delete(Key key) {
+		//TODO fill in the correct implementation.
+		root=delete(root,key);    	
+	}
 
-    private Node floor(Node x, Key key) {
-        if (x == null) return null;
-        int cmp = key.compareTo(x.key);
-        if (cmp == 0) return x;
-        if (cmp <  0) return floor(x.left, key);
-        Node t = floor(x.right, key); 
-        if (t != null) return t;
-        else return x; 
-    } 
-
-    public Key floor2(Key key) {
-        Key x = floor2(root, key, null);
-        if (x == null) throw new NoSuchElementException("argument to floor() is too small");
-        else return x;
-
-    }
-
-    private Key floor2(Node x, Key key, Key best) {
-        if (x == null) return best;
-        int cmp = key.compareTo(x.key);
-        if      (cmp  < 0) return floor2(x.left, key, best);
-        else if (cmp  > 0) return floor2(x.right, key, x.key);
-        else               return x.key;
-    } 
-
-    /**
-     * Returns the smallest key in the symbol table greater than or equal to {@code key}.
-     *
-     * @param  key the key
-     * @return the smallest key in the symbol table greater than or equal to {@code key}
-     * @throws NoSuchElementException if there is no such key
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public Key ceiling(Key key) {
-        if (key == null) throw new IllegalArgumentException("argument to ceiling() is null");
-        if (isEmpty()) throw new NoSuchElementException("calls ceiling() with empty symbol table");
-        Node x = ceiling(root, key);
-        if (x == null) throw new NoSuchElementException("argument to floor() is too large");
-        else return x.key;
-    }
-
-    private Node ceiling(Node x, Key key) {
-        if (x == null) return null;
-        int cmp = key.compareTo(x.key);
-        if (cmp == 0) return x;
-        if (cmp < 0) { 
-            Node t = ceiling(x.left, key); 
-            if (t != null) return t;
-            else return x; 
-        } 
-        return ceiling(x.right, key); 
-    } 
-
-    /**
-     * Return the key in the symbol table of a given {@code rank}.
-     * This key has the property that there are {@code rank} keys in
-     * the symbol table that are smaller. In other words, this key is the
-     * ({@code rank}+1)st smallest key in the symbol table.
-     *
-     * @param  rank the order statistic
-     * @return the key in the symbol table of given {@code rank}
-     * @throws IllegalArgumentException unless {@code rank} is between 0 and
-     *        <em>n</em>–1
-     */
-    public Key select(int rank) {
-        if (rank < 0 || rank >= size()) {
-            throw new IllegalArgumentException("argument to select() is invalid: " + rank);
-        }
-        return select(root, rank);
-    }
-
-    // Return key in BST rooted at x of given rank.
-    // Precondition: rank is in legal range.
-    private Key select(Node x, int rank) {
-        if (x == null) return null;
-        int leftSize = size(x.left);
-        if      (leftSize > rank) return select(x.left,  rank);
-        else if (leftSize < rank) return select(x.right, rank - leftSize - 1); 
-        else                      return x.key;
-    }
-
-    /**
-     * Return the number of keys in the symbol table strictly less than {@code key}.
-     *
-     * @param  key the key
-     * @return the number of keys in the symbol table strictly less than {@code key}
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public int rank(Key key) {
-        if (key == null) throw new IllegalArgumentException("argument to rank() is null");
-        return rank(key, root);
-    } 
-
-    // Number of keys in the subtree less than key.
-    private int rank(Key key, Node x) {
-        if (x == null) return 0; 
-        int cmp = key.compareTo(x.key); 
-        if      (cmp < 0) return rank(key, x.left); 
-        else if (cmp > 0) return 1 + size(x.left) + rank(key, x.right); 
-        else              return size(x.left); 
-    } 
-
-    /**
-     * Returns all keys in the symbol table as an {@code Iterable}.
-     * To iterate over all of the keys in the symbol table named {@code st},
-     * use the foreach notation: {@code for (Key key : st.keys())}.
-     *
-     * @return all keys in the symbol table
-     
-    public Iterable<Key> keys() {
-        if (isEmpty()) return new Queue<Key>();
-        return keys(min(), max());
-    }*/
-
-    /**
-     * Returns all keys in the symbol table in the given range,
-     * as an {@code Iterable}.
-     *
-     * @param  lo minimum endpoint
-     * @param  hi maximum endpoint
-     * @return all keys in the symbol table between {@code lo} 
-     *         (inclusive) and {@code hi} (inclusive)
-     * @throws IllegalArgumentException if either {@code lo} or {@code hi}
-     *         is {@code null}
-     
-    public Iterable<Key> keys(Key lo, Key hi) {
-        if (lo == null) throw new IllegalArgumentException("first argument to keys() is null");
-        if (hi == null) throw new IllegalArgumentException("second argument to keys() is null");
-
-        Queue<Key> queue = new Queue<Key>();
-        keys(root, queue, lo, hi);
-        return queue;
-    } 
-
-    private void keys(Node x, Queue<Key> queue, Key lo, Key hi) { 
-        if (x == null) return; 
-        int cmplo = lo.compareTo(x.key); 
-        int cmphi = hi.compareTo(x.key); 
-        if (cmplo < 0) keys(x.left, queue, lo, hi); 
-        if (cmplo <= 0 && cmphi >= 0) queue.enqueue(x.key); 
-        if (cmphi > 0) keys(x.right, queue, lo, hi); 
-    } */
-
-    /**
-     * Returns the number of keys in the symbol table in the given range.
-     *
-     * @param  lo minimum endpoint
-     * @param  hi maximum endpoint
-     * @return the number of keys in the symbol table between {@code lo} 
-     *         (inclusive) and {@code hi} (inclusive)
-     * @throws IllegalArgumentException if either {@code lo} or {@code hi}
-     *         is {@code null}
-     */
-    public int size(Key lo, Key hi) {
-        if (lo == null) throw new IllegalArgumentException("first argument to size() is null");
-        if (hi == null) throw new IllegalArgumentException("second argument to size() is null");
-
-        if (lo.compareTo(hi) > 0) return 0;
-        if (contains(hi)) return rank(hi) - rank(lo) + 1;
-        else              return rank(hi) - rank(lo);
-    }
-
-    /**
-     * Returns the height of the BST (for debugging).
-     *
-     * @return the height of the BST (a 1-node tree has height 0)
-     */
-    public int height() {
-        return height(root);
-    }
-    private int height(Node x) {
-        if (x == null) return -1;
-        return 1 + Math.max(height(x.left), height(x.right));
-    }
-
-    /**
-     * Returns the keys in the BST in level order (for debugging).
-     *
-     * @return the keys in the BST in level order traversal
-     */
-    public Iterable<Key> levelOrder() {
-        Queue<Key> keys = new Queue<Key>();
-        Queue<Node> queue = new Queue<Node>();
-        queue.enqueue(root);
-        while (!queue.isEmpty()) {
-            Node x = queue.dequeue();
-            if (x == null) continue;
-            keys.enqueue(x.key);
-            queue.enqueue(x.left);
-            queue.enqueue(x.right);
-        }
-        return keys;
-    }
-
-//author AprilS21
-
-    public Node lowestCommonAncestor(Node root, Node p, Node q) {
-        if(root == null || root == p || root == q)  return root;
-        Node left = lowestCommonAncestor(root.left, p, q);
-        Node right = lowestCommonAncestor(root.right, p, q);
-        if(left != null && right != null)   return root;
-        return left != null ? left : right;
-    }
+	private Node delete(Node node, Key key) {
+		if(node == null) {
+			return null;
+		}
+		int cmp = key.compareTo(node.key);
+		if      (cmp < 0) node.left  = delete(node.left,  key);
+		else if (cmp > 0) node.right = delete(node.right, key);
+		else { 
+			if (node.right == null) return node.left;
+			if (node.left  == null) return node.right;
+			
+			Node t = node;
+			node = max(t.left);
+			node.left = deleteMax(t.left);
+			node.right = t.right;
+		} 
+		node.N = size(node.left) + size(node.right) + 1;
+		return node;
+	}
 
 
+	//Sedgewick and Wayne from book
+	public void deleteMax() {
+	//	if (isEmpty()) throw new NoSuchElementException("Symbol table underflow");
+		root = deleteMax(root);
 
+	}
+
+	private Node deleteMax(Node x) {
+		if (x.right == null) return x.left;
+		x.right = deleteMax(x.right);
+		x.N = size(x.left) + size(x.right) + 1;
+		return x;
+	}
+
+	public Key max() {
+	//	if (isEmpty()) throw new NoSuchElementException("calls max() with empty symbol table");
+		return max(root).key;
+	} 
+
+	private Node max(Node x) {
+		if (x.right == null) return x; 
+		else                 return max(x.right); 
+	} 
 }

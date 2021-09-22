@@ -11,13 +11,6 @@ public class LCA {
     for(int i=0; i < split.length; i++){
         bst.put(split[i],i);
     }
-    for (Object s : bst.levelOrder()){
-            System.out.println(s + " " + bst.get((String)s));
-
-    }
-    System.out.println("Input the two values in the BST you want to find the LCA of");
-    String values2 = scanner.next();
-    String[] split2 = values2.split(",");
-   // Object lca = bst.lowestCommonAncestor(bst.root, split2[0], split2[1]);
+    
 }
 }
