@@ -11,6 +11,12 @@ public class LCA {
     for(int i=0; i < split.length; i++){
         bst.put(split[i],i);
     }
-    
+    System.out.println(bst.printKeysInOrder());
+    System.out.println("Input the two values you want to find the LCA separated by commas ");
+    String values2 = scanner.next();
+    String[] split2 = values2.split(",");
+    String a = split2[0];
+    String b = split2[1];
+    System.out.println("The LCA of these two values is : "+ bst.lowestCommonAncestor(a, b));
 }
 }

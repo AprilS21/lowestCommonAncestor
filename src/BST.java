@@ -262,4 +262,38 @@ public class BST<Key extends Comparable<Key>, Value> {
 		if (x.right == null) return x; 
 		else                 return max(x.right); 
 	} 
+
+	//LCA Function
+
+	public String lowestCommonAncestor (String a, String b){
+		//System.out.println(root.key.toString());
+		Node nodeA = findX(root,(Key) a);
+		Node nodeB = findX(root,(Key) b);
+		//System.out.println(nodeA.key.toString());
+		Node lca = lowestCommonAncestor(root, nodeA, nodeB);
+		//System.out.println(lca.key.toString());
+		return lca.key.toString();
+	}
+
+	private Node lowestCommonAncestor(Node root, Node p, Node q) {
+        if(root == null || root == p || root == q)  return root;
+        Node left = lowestCommonAncestor(root.left, p, q);
+        Node right = lowestCommonAncestor(root.right, p, q);
+        if(left != null && right != null)   return root;
+        return left != null ? left : right;
+    }
+
+
+	private Node findX(Node root, Key x) {
+		if(root == null) return null;
+		int cmp = root.key.compareTo(x);
+		if(cmp ==0) return root;
+	
+		Node left = findX(root.left,x);
+		Node right = findX(root.right,x);
+	
+		if(left == null) return right;
+		return left;
+	
+	}
 }
