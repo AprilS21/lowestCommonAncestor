@@ -12,6 +12,7 @@ public class LCA {
         bst.put(split[i],i);
     }
     System.out.println(bst.printKeysInOrder());
+    System.out.println(bst.prettyPrintKeys());
     System.out.println("Input the two values you want to find the LCA separated by commas ");
     String values2 = scanner.next();
     String[] split2 = values2.split(",");
