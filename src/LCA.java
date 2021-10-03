@@ -1,5 +1,7 @@
 import java.util.Scanner;
 
+import org.junit.Test;
+
 public class LCA {
    
     public static void main(String[] args) {
@@ -24,4 +26,5 @@ public class LCA {
 
     }
     }
-}}
+}
+}
