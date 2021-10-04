@@ -52,4 +52,18 @@ public class TestLCA {
          assertEquals(bst.getKey(test), null);
 
     }
+
+    @Test
+    public void testLowestCommonAncestor(){
+        BST bst = new BST();
+        bst.put("f",1); //       f
+        bst.put("a",2); //    e     k
+        bst.put("k",3); //   a        x
+        bst.put("x",4); //
+        bst.put("e",5); //
+         String a = "x";
+         String b = "a";
+         System.out.println("The LCA of these two values is : "+ bst.lowestCommonAncestor(a, b));
+         //assertEquals(bst.lowestCommonAncestor("1", "6"),"3");
+    }
 }
