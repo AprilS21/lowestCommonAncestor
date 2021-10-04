@@ -64,6 +64,9 @@ public class TestLCA {
          String a = "x";
          String b = "a";
          System.out.println("The LCA of these two values is : "+ bst.lowestCommonAncestor(a, b));
-         //assertEquals(bst.lowestCommonAncestor("1", "6"),"3");
+         assertEquals("f",bst.lowestCommonAncestor(a, b));
+        a = "m";                                //element not in BST
+        assertEquals("LCA does not exist for these two values",bst.lowestCommonAncestor(a, b));
+
     }
 }
