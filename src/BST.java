@@ -12,12 +12,12 @@
 import java.util.NoSuchElementException;
 
 public class BST<Key extends Comparable<Key>, Value> {
-	private Node root;             // root of BST
+	public Node root;             // root of BST
 
 	/**
 	 * Private node class.
 	 */
-	private class Node {
+	public class Node {
 		private Key key;           // sorted by key
 		private Value val;         // associated data
 		private Node left, right;  // left and right subtrees
@@ -28,6 +28,13 @@ public class BST<Key extends Comparable<Key>, Value> {
 			this.val = val;
 			this.N = N;
 		}
+	}
+
+	public Key getKey(Node node){
+		if(node == null){
+			return null;
+		}
+		return node.key;
 	}
 
 	// is the symbol table empty?
@@ -269,6 +276,9 @@ public class BST<Key extends Comparable<Key>, Value> {
 		//System.out.println(root.key.toString());
 		Node nodeA = findX(root,(Key) a);
 		Node nodeB = findX(root,(Key) b);
+		if(nodeA == null || nodeB == null){
+			return "LCA does not exist for these two values";
+		}
 		//System.out.println(nodeA.key.toString());
 		Node lca = lowestCommonAncestor(root, nodeA, nodeB);
 		//System.out.println(lca.key.toString());
@@ -284,7 +294,7 @@ public class BST<Key extends Comparable<Key>, Value> {
     }
 
 
-	private Node findX(Node root, Key x) {
+	public Node findX(Node root, Key x) {
 		if(root == null) return null;
 		int cmp = root.key.compareTo(x);
 		if(cmp ==0) return root;
