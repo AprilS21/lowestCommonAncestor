@@ -190,7 +190,7 @@ public class DAG {
     private String toString(ArrayList<Integer>[] adjTable) {
         String string = "";
         for (int v = 0; v < adjTable.length; v++) {
-            string += v + "--- ";
+            string += v + ": ";
             for (int vertex : adjTable[v])  // Add each vertex in the current adjacency list.
                 string += vertex + " ";
             string += "\n";
